@@ -417,7 +417,6 @@ res_nsend(res_state statp,
 	 */
 	if (EXT(statp).nscount != 0) {
 		int needclose = 0;
-		struct sockaddr_storage peer;
 		union {
 			struct sockaddr_storage storage;
 			struct sockaddr generic;
@@ -1062,7 +1061,6 @@ send_dg(res_state statp,
 	int nsaplen;
 	struct timespec now, timeout, finish;
 	fd_set dsmask;
-	struct sockaddr_storage from;
 	union {
 		struct sockaddr_storage storage;
 		struct sockaddr generic;
