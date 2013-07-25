@@ -393,8 +393,7 @@ libc_common_src_files += \
 	bionic/pthread-atfork.c.arm \
 	bionic/pthread-rwlocks.c.arm \
 	bionic/pthread-timers.c.arm \
-	bionic/ptrace.c.arm \
-	arch-arm/bionic/memcpy.S \
+	bionic/ptrace.c.arm
 
 libc_static_common_src_files += \
     bionic/pthread.c.arm \
@@ -404,6 +403,7 @@ libc_static_common_src_files += \
 ifeq ($(ARCH_ARM_HAVE_ARMV7A),true)
 libc_common_src_files += \
 	arch-arm/bionic/armv7/memchr.S \
+	arch-arm/bionic/armv7/memcpy.S \
 	arch-arm/bionic/armv7/memset.S \
 	arch-arm/bionic/armv7/strchr.S \
 	arch-arm/bionic/armv7/strcpy.c \
@@ -411,6 +411,7 @@ libc_common_src_files += \
 else
 libc_common_src_files += \
 	string/memchr.c \
+	arch-arm/bionic/memcpy.S \
 	arch-arm/bionic/memset.S \
 	string/strchr.c \
 	arch-arm/bionic/strcpy.S \
