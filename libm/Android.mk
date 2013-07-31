@@ -222,6 +222,11 @@ libm_common_includes := $(LOCAL_PATH)/upstream-freebsd/lib/msun/src/
 
 libm_arm_includes := $(LOCAL_PATH)/arm
 libm_arm_src_files := arm/fenv.c
+ifeq ($(TARGET_ARCH), arm)
+LOCAL_CFLAGS += $(libm_arm_cflags)
+LOCAL_ASFLAGS += $(libm_arm_asflags)
+LOCAL_SRC_FILES += $(libm_arm_src_files)
+endif
 
 libm_x86_includes := $(LOCAL_PATH)/i386 $(LOCAL_PATH)/i387
 libm_x86_src_files := i387/fenv.c
@@ -229,6 +234,32 @@ libm_x86_src_files := i387/fenv.c
 libm_mips_cflags := -fno-builtin-rintf -fno-builtin-rint
 libm_mips_includes := $(LOCAL_PATH)/mips
 libm_mips_src_files := mips/fenv.c
+
+ifeq ($(TARGET_CPU_VARIANT),cortex-a9)
+libm_arm_src_files += \
+    arm/k_log2.S \
+    arm/k_pow2.S \
+    arm/e_fast_pow.S
+libm_arm_cflags += -DTARGET_CPU_VARIANT_CORTEX_A9
+libm_arm_asflags += -DTARGET_CPU_VARIANT_CORTEX_A9
+endif
+ifeq ($(TARGET_CPU_VARIANT),cortex-a15)
+libm_arm_src_files += \
+    arm/k_log2.S \
+    arm/k_pow2.S \
+    arm/e_fast_pow.S
+libm_arm_cflags += -DTARGET_CPU_VARIANT_CORTEX_A15
+libm_arm_asflags += -DTARGET_CPU_VARIANT_CORTEX_A15
+endif
+
+ifeq ($(TARGET_CPU_VARIANT),krait)
+libm_arm_src_files += \
+    arm/k_log2.S \
+    arm/k_pow2.S \
+    arm/e_fast_pow.S
+libm_arm_cflags += -DTARGET_CPU_VARIANT_CORTEX_KRAIT
+libm_arm_asflags += -DTARGET_CPU_VARIANT_CORTEX_KRAIT
+endif
 
 #
 # libm.a for target.
@@ -238,6 +269,7 @@ LOCAL_MODULE:= libm
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 LOCAL_ARM_MODE := arm
 LOCAL_CFLAGS := $(libm_common_cflags) $(libm_$(TARGET_ARCH)_cflags)
+LOCAL_ASFLAGS := $(libm_common_asflags)
 LOCAL_C_INCLUDES += $(libm_common_includes) $(libm_$(TARGET_ARCH)_includes)
 LOCAL_SRC_FILES := $(libm_common_src_files) $(libm_$(TARGET_ARCH)_src_files)
 LOCAL_SYSTEM_SHARED_LIBRARIES := libc

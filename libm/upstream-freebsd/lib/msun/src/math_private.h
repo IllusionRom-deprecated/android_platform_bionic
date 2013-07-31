@@ -1,6 +1,7 @@
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ * Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
@@ -679,7 +680,9 @@ irintl(long double x)
 #define	__ieee754_exp	exp
 #define	__ieee754_cosh	cosh
 #define	__ieee754_fmod	fmod
+#if !defined(TARGET_CPU_VARIANT_CORTEX_A9) && !defined(TARGET_CPU_VARIANT_CORTEX_A15) && !defined(TARGET_CPU_VARIANT_KRAIT)
 #define	__ieee754_pow	pow
+#endif
 #define	__ieee754_lgamma lgamma
 #define	__ieee754_gamma	gamma
 #define	__ieee754_lgamma_r lgamma_r
