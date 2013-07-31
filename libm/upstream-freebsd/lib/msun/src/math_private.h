@@ -682,6 +682,8 @@ irintl(long double x)
 #if !defined(ARM_MATH_OPTIMIZATIONS)
 #define	__ieee754_pow	pow
 #define	__ieee754_exp	exp
+#define	__ieee754_sin	sin
+#define	__ieee754_cos	cos
 #endif
 #define	__ieee754_lgamma lgamma
 #define	__ieee754_gamma	gamma
