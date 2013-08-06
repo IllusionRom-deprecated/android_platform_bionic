@@ -1,4 +1,4 @@
-/* Copyright (C) 2012 The Android Open Source Project
+/* Copyright (C) 2013 The Android Open Source Project
  * Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -66,10 +66,11 @@
 #define t3		d23
 #define t2		d24
 #define t1		d25
-#define dx		d27
-#define a		d29
-#define log2a		d30
-#define a_recp		d31
+#define d2		d28
+#define dx		d26
+#define a		d27
+#define log2a		d24
+#define a_recp		d25
 
 ENTRY_PRIVATE(__kernel_log2)	/* x in d0 and r0/r1, 1.0 <= x < 2.0 */
 
@@ -87,8 +88,7 @@ lookup:
 	vldmia		ip, {log2a-a_recp}
 
 taylor_series_expanding:
-	adr		ip, .Ls6
-	vldmia		ip, {t6-t1}
+
 
 	/* dx = x - a; */
 	vsub.f64	dx, x, a
@@ -96,19 +96,23 @@ taylor_series_expanding:
 	vmul.f64	dx, dx, a_recp
 
 	vmov		ret, log2a
-	/* S5 + S6 * dx */
+	vmul.f64	d2, dx, dx
+	adr		ip, .Ls6
+	vldmia		ip, {t6-t1}
 	vmla.f64	t5, t6, dx
-	/* S4 + (S5 + S6 * dx) * dx */
-	vmla.f64	t4, t5, dx
-	/* S3 + (S4 + (S5 + S6 * dx) * dx) * dx */
+	/* S5 + S6 * dx */
 	vmla.f64	t3, t4, dx
-	/* S2 + (S3 + (S4 + (S5 + S6 * dx) * dx) * dx) * dx */
-	vmla.f64	t2, t3, dx
-	/* S1 + (S2 + (S3 + (S4 + (S5 + S6 * dx) * dx) * dx) * dx) * dx */
+	/* S3 + S4 * dx */
 	vmla.f64	t1, t2, dx
-	/* log2(a) + (S1 + (S2 + (S3 + (S4 + (S5 + S6 *
-		dx) * dx) * dx) * dx) * dx) * dx */
+	/* S1 + S2 * dx */
+	vmla.f64	t3, t5, d2
+	/* S3 + S4 * dx + (S5 + S6 * dx) * dx^2 */
+	vmla.f64	t1, t3, d2
+	/* S1 + S2 * dx +
+           (S3 + S4 * dx + (S5 + S6 * dx) * dx^2) * dx^2 */
 	vmla.f64	ret, t1, dx
+	/* log2(a) + (S1 + S2 * dx + (S3 + S4 * dx^2 +
+	(S5 + S6 * dx^2) * dx^2) * dx^2) * dx */
 	bx		lr
 
 .Ls6:
