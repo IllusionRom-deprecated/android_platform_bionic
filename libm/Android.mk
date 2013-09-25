@@ -239,7 +239,9 @@ ifeq ($(TARGET_CPU_VARIANT),cortex-a9)
 libm_arm_src_files += \
     arm/k_log2.S \
     arm/k_pow2.S \
-    arm/e_fast_pow.S
+    arm/k_exp.S \
+    arm/e_fast_pow.S \
+    arm/e_fast_exp.S
 libm_arm_cflags += -DTARGET_CPU_VARIANT_CORTEX_A9
 libm_arm_asflags += -DTARGET_CPU_VARIANT_CORTEX_A9
 endif
@@ -247,7 +249,9 @@ ifeq ($(TARGET_CPU_VARIANT),cortex-a15)
 libm_arm_src_files += \
     arm/k_log2.S \
     arm/k_pow2.S \
-    arm/e_fast_pow.S
+    arm/k_exp.S \
+    arm/e_fast_pow.S \
+    arm/e_fast_exp.S
 libm_arm_cflags += -DTARGET_CPU_VARIANT_CORTEX_A15
 libm_arm_asflags += -DTARGET_CPU_VARIANT_CORTEX_A15
 endif
@@ -256,7 +260,9 @@ ifeq ($(TARGET_CPU_VARIANT),krait)
 libm_arm_src_files += \
     arm/k_log2.S \
     arm/k_pow2.S \
-    arm/e_fast_pow.S
+    arm/k_exp.S \
+    arm/e_fast_pow.S \
+    arm/e_fast_exp.S
 libm_arm_cflags += -DTARGET_CPU_VARIANT_CORTEX_KRAIT
 libm_arm_asflags += -DTARGET_CPU_VARIANT_CORTEX_KRAIT
 endif
