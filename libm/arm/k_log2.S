@@ -66,7 +66,7 @@
 #define t3		d23
 #define t2		d24
 #define t1		d25
-#define d2		d28
+#define dx2		d28
 #define dx		d26
 #define a		d27
 #define log2a		d24
@@ -96,7 +96,7 @@ taylor_series_expanding:
 	vmul.f64	dx, dx, a_recp
 
 	vmov		ret, log2a
-	vmul.f64	d2, dx, dx
+	vmul.f64	dx2, dx, dx
 	adr		ip, .Ls6
 	vldmia		ip, {t6-t1}
 	vmla.f64	t5, t6, dx
@@ -105,9 +105,9 @@ taylor_series_expanding:
 	/* S3 + S4 * dx */
 	vmla.f64	t1, t2, dx
 	/* S1 + S2 * dx */
-	vmla.f64	t3, t5, d2
+	vmla.f64	t3, t5, dx2
 	/* S3 + S4 * dx + (S5 + S6 * dx) * dx^2 */
-	vmla.f64	t1, t3, d2
+	vmla.f64	t1, t3, dx2
 	/* S1 + S2 * dx +
            (S3 + S4 * dx + (S5 + S6 * dx) * dx^2) * dx^2 */
 	vmla.f64	ret, t1, dx
