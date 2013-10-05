@@ -73,7 +73,7 @@ class ElfReader {
   // First page of reserved address space.
   void* load_start_;
   // Size in bytes of reserved address space.
-  Elf_Addr load_size_;
+  size_t load_size_;
   // Load bias.
   Elf32_Addr load_bias_;
   // For prelinked libraries, mandatory load address of the first
