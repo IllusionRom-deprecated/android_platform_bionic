@@ -59,8 +59,6 @@ libc_common_src_files := \
 	stdlib/tolower_.c \
 	stdlib/toupper_.c \
 	string/strcasecmp.c \
-	string/strcat.c \
-	string/strchr.c \
 	string/strcspn.c \
 	string/strdup.c \
 	string/strpbrk.c \
