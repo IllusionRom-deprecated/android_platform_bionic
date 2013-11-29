@@ -58,6 +58,15 @@
 #define a		d27
 #define pow2a		d28
 
+#if FPU_VFPV4
+	.fpu	vfpv4
+#define MLAF64		vfma.f64
+#define MLSF64		vfms.f64
+#else
+#define MLAF64		vmla.f64
+#define MLSF64		vmls.f64
+#endif
+
 ENTRY(__kernel_pow2)	/* x in d0 and r0/r1, 1.0 <= x < 2.0 */
 
 lookup:
@@ -82,15 +91,15 @@ taylor_series:
 	vsub.f64	dx, x, a
 
 	/* S4 + S5 * dx */
-	vmla.f64	t4, t5, dx
+	MLAF64	t4, t5, dx
 	/* S3 + (S4 + S5 * dx) * dx */
-	vmla.f64	t3, t4, dx
+	MLAF64	t3, t4, dx
 	/* S2 + (S3 + (S4 + S5 * dx) * dx) * dx */
-	vmla.f64	t2, t3, dx
+	MLAF64	t2, t3, dx
 	/* S1 + (S2 + (S3 + (S4 + S5 * dx) * dx) * dx) * dx */
-	vmla.f64	t1, t2, dx
+	MLAF64	t1, t2, dx
 	/* 1.0 + (S1 + (S2 + (S3 + (S4 + S5 * dx) * dx) * dx) * dx) * dx */
-	vmla.f64	t0, t1, dx
+	MLAF64	t0, t1, dx
 	/* (2^a) * (1.0 + (S1 + (S2 + (S3 + (S4 + S5 *
 		dx) * dx) * dx) * dx) * dx) */
 	vmul.f64	ret, pow2a, t0

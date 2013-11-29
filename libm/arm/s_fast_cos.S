@@ -16,6 +16,15 @@
 
 #include <bionic_asm.h>
 
+#if FPU_VFPV4
+	.fpu	vfpv4
+#define MLAF64		vfma.f64
+#define MLSF64		vfms.f64
+#else
+#define MLAF64		vmla.f64
+#define MLSF64		vmls.f64
+#endif
+
 ENTRY(cos)
 
     bic             r1, r1, #0x80000000
@@ -66,22 +75,22 @@ ENTRY(cos)
     adr             ip, .Lc5
     vldmia          ip, {d21 - d31}
 
-    vmls.f64        d22, d21, d18
-    vnmls.f64       d23, d22, d18
-    vmla.f64        d24, d23, d18
-    vnmls.f64       d25, d24, d18
-    vmla.f64        d19, d25, d18
+    MLSF64          d22, d21, d18
+    MLSF64          d23, d22, d18
+    MLSF64          d24, d23, d18
+    MLSF64          d25, d24, d18
+    MLSF64          d19, d25, d18
     vmul.f64        d19, d19, d16
 
     vmov.f64        d20, #1.0
-    vnmls.f64       d27, d26, d18
-    vmla.f64        d28, d27, d18
-    vnmls.f64       d29, d28, d18
-    vmla.f64        d30, d29, d18
-    vnmls.f64       d31, d30, d18
-    vmla.f64        d20, d31, d18
+    MLSF64          d27, d26, d18
+    MLSF64          d28, d27, d18
+    MLSF64          d29, d28, d18
+    MLSF64          d30, d29, d18
+    MLSF64          d31, d30, d18
+    MLSF64          d20, d31, d18
     vmul.f64        d20, d20, d17
-    vmls.f64        d20, d19, d0
+    MLSF64          d20, d19, d0
 
     vmov            r0, r1, d20
 
