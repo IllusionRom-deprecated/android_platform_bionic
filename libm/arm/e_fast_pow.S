@@ -31,6 +31,7 @@
 #define ylog2x		d21
 #define iylog2xd	d22
 #define t0		d23
+#define diff		d24
 
 #if FPU_VFPV4
 	.fpu	vfpv4
@@ -102,8 +103,13 @@ ENTRY(pow)	/* x in r0, r1. y in r2, r3 */
 	/* ylog2x = ret * y + exp * y; */
 	vmov		exp, r5
 	vcvt.f64.s32	expd, exp
-	vmul.f64        ylog2x, ret, y
-	MLAF64          ylog2x, expd, y
+	vmul.f64	ylog2x, ret, y
+	MLAF64		ylog2x, expd, y
+
+	/* get the diff */
+	vmov.f64	diff, ylog2x
+	MLSF64		diff, expd, y
+	MLSF64		diff, ret, y
 
 	/* iylog2x = (int)ylog2x; */
 	vcvt.s32.f64	iylog2x, ylog2x
@@ -112,8 +118,8 @@ ENTRY(pow)	/* x in r0, r1. y in r2, r3 */
 
 	/* x = 1.0 + ylog2x - iylog2x; */
 	vmov.f64	t0, #1.0
-	vadd.f64	x, t0, ylog2x
-	vsub.f64	x, x, iylog2xd
+	vsub.f64	x, ylog2x, iylog2xd
+	vadd.f64	x, x, t0
 
 	/* if (x < 1.0) {iylog2x--; x++;} */
 	vcmp.f64	x, t0
@@ -123,6 +129,9 @@ ENTRY(pow)	/* x in r0, r1. y in r2, r3 */
 	vadd.f64	x, x, t0
 
 skip:
+	/* default diff from x*/
+	vsub.f64	x, x, diff
+
 	/* ret = __kernel_pow2(x); */
 	/* 1.0 <= x < 2.0 */
 	/* 2.0 <= ret < 4.0 */
