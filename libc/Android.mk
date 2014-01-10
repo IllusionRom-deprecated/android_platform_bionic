@@ -366,16 +366,12 @@ ifeq ($(TARGET_ARCH),arm)
 libc_common_src_files += \
 	bionic/memmove.c.arm \
 	string/bcopy.c \
-	string/strncmp.c \
-	string/strncat.c \
 	string/strncpy.c \
 	bionic/strchr.cpp \
 	string/strrchr.c \
 	bionic/memchr.c \
 	bionic/memrchr.c \
 	string/index.c \
-	bionic/strnlen.c \
-	string/strlcat.c \
 	string/strlcpy.c \
 	upstream-freebsd/lib/libc/string/wcschr.c \
 	upstream-freebsd/lib/libc/string/wcsrchr.c \
