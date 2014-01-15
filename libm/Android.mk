@@ -64,8 +64,6 @@ libm_common_src_files += \
     upstream-freebsd/lib/msun/src/e_scalbf.c \
     upstream-freebsd/lib/msun/src/e_sinh.c \
     upstream-freebsd/lib/msun/src/e_sinhf.c \
-    upstream-freebsd/lib/msun/src/e_sqrt.c \
-    upstream-freebsd/lib/msun/src/e_sqrtf.c \
     upstream-freebsd/lib/msun/src/k_cos.c \
     upstream-freebsd/lib/msun/src/k_cosf.c \
     upstream-freebsd/lib/msun/src/k_exp.c \
@@ -236,11 +234,15 @@ libm_mips_includes := $(LOCAL_PATH)/mips
 libm_mips_src_files := mips/fenv.c
 
 libm_generic_src_files := \
+    upstream-freebsd/lib/msun/src/e_sqrt.c \
+    upstream-freebsd/lib/msun/src/e_sqrtf.c \
     upstream-freebsd/lib/msun/src/s_cos.c \
     upstream-freebsd/lib/msun/src/s_sin.c
 
 libm_arm_neon_src_files := \
     arm/e_pow.S \
+    arm/e_sqrt.S \
+    arm/e_sqrtf.S \
     arm/s_cos.S \
     arm/s_sin.S
 
