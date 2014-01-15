@@ -95,7 +95,6 @@ libm_common_src_files += \
     upstream-freebsd/lib/msun/src/s_conjf.c \
     upstream-freebsd/lib/msun/src/s_copysign.c \
     upstream-freebsd/lib/msun/src/s_copysignf.c \
-    upstream-freebsd/lib/msun/src/s_cos.c \
     upstream-freebsd/lib/msun/src/s_cosf.c \
     upstream-freebsd/lib/msun/src/s_cproj.c \
     upstream-freebsd/lib/msun/src/s_cprojf.c \
@@ -165,7 +164,6 @@ libm_common_src_files += \
     upstream-freebsd/lib/msun/src/s_signgam.c \
     upstream-freebsd/lib/msun/src/s_significand.c \
     upstream-freebsd/lib/msun/src/s_significandf.c \
-    upstream-freebsd/lib/msun/src/s_sin.c \
     upstream-freebsd/lib/msun/src/s_sinf.c \
     upstream-freebsd/lib/msun/src/s_tan.c \
     upstream-freebsd/lib/msun/src/s_tanf.c \
@@ -237,9 +235,19 @@ libm_mips_cflags := -fno-builtin-rintf -fno-builtin-rint
 libm_mips_includes := $(LOCAL_PATH)/mips
 libm_mips_src_files := mips/fenv.c
 
+libm_generic_src_files := \
+    upstream-freebsd/lib/msun/src/s_cos.c \
+    upstream-freebsd/lib/msun/src/s_sin.c
+
+libm_arm_neon_src_files := \
+    arm/e_pow.S \
+    arm/s_cos.S \
+    arm/s_sin.S
+
 ifeq ($(ARCH_ARM_HAVE_NEON),true)
-  libm_common_src_files += arm/e_pow.S
-  libm_common_cflags += -D__NEON__
+  libm_common_src_files += $(libm_arm_neon_src_files)
+else # ! ARCH_ARM_HAVE_NEON
+  libm_common_src_files += $(libm_generic_src_files)
 endif
 
 #
