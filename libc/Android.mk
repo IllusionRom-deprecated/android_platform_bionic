@@ -401,6 +401,10 @@ libc_static_common_src_files += \
 
 endif # arm
 
+ifeq ($(ARCH_ARM_HAVE_ARMV7A),true)
+  libc_common_cflags += -DNEON_UNALIGNED_ACCESS -DNEON_MEMCPY_ALIGNMENT_DIVIDER=224
+endif
+
 ifeq ($(TARGET_ARCH),x86)
 libc_common_src_files += \
     bionic/pthread-atfork.c \
