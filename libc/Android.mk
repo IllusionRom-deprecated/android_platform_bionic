@@ -395,8 +395,13 @@ libc_static_common_src_files += \
 
 endif # arm
 
-ifeq ($(ARCH_ARM_HAVE_ARMV7A),true)
-  libc_common_cflags += -DNEON_UNALIGNED_ACCESS -DNEON_MEMCPY_ALIGNMENT_DIVIDER=224
+ifeq ($(TARGET_CPU_VARIANT),$(filter $(TARGET_CPU_VARIANT),cortex-a15 cortex-a7 cortex-a8 cortex-a9 krait))
+  ifeq ($(strip $(ARCH_ARM_NEON_MEMCPY_ALIGNMENT_DIVIDER)),)
+    libc_common_cflags += -DNEON_MEMCPY_ALIGNMENT_DIVIDER=224
+  else
+    libc_common_cflags += -DNEON_MEMCPY_ALIGNMENT_DIVIDER=$(ARCH_ARM_NEON_MEMCPY_ALIGNMENT_DIVIDER)
+  endif
+  libc_common_cflags += -DNEON_UNALIGNED_ACCESS
 endif
 
 ifeq ($(TARGET_ARCH),x86)
