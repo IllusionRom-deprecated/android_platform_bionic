@@ -320,6 +320,24 @@ LOCAL_ASFLAGS := $(libm_common_asflags)
 LOCAL_C_INCLUDES += $(libm_common_includes) $(libm_$(TARGET_ARCH)_includes)
 LOCAL_SRC_FILES := $(libm_common_src_files) $(libm_$(TARGET_ARCH)_src_files)
 LOCAL_SYSTEM_SHARED_LIBRARIES := libc
+
+# arch-specific settings
+LOCAL_C_INCLUDES_arm := $(LOCAL_PATH)/arm
+LOCAL_SRC_FILES_arm := arm/fenv.c
+
+LOCAL_C_INCLUDES_arm64 := $(LOCAL_PATH)/arm64
+LOCAL_SRC_FILES_arm64 := arm64/fenv.c
+
+LOCAL_C_INCLUDES_x86 := $(LOCAL_PATH)/i386 $(LOCAL_PATH)/i387
+LOCAL_SRC_FILES_x86 := i387/fenv.c
+
+LOCAL_C_INCLUDES_x86_64 := $(LOCAL_PATH)/amd64
+LOCAL_SRC_FILES_x86_64 := amd64/fenv.c
+
+LOCAL_CFLAGS_mips := -fno-builtin-rintf -fno-builtin-rint
+LOCAL_C_INCLUDES_mips := $(LOCAL_PATH)/mips
+LOCAL_SRC_FILES_mips := mips/fenv.c
+
 include $(BUILD_STATIC_LIBRARY)
 
 #
