@@ -530,7 +530,7 @@ ifeq ($(TARGET_ARCH),x86)
   endif
 endif # x86
 
-ifeq ($(TARGET_ARCH),mips)
+ifeq ($(TARGET_ARCH),$(filter $(TARGET_ARCH),mips mips64))
   ifneq ($(ARCH_MIPS_HAS_FPU),true)
     libc_common_cflags += -DSOFTFLOAT
   endif
