@@ -1,5 +1,5 @@
 /* Copyright (C) 2012 The Android Open Source Project
- * Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2013-2014, NVIDIA CORPORATION.  All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,6 +120,12 @@ skip:
 	vmov		r0, r1, x
 	bl		__kernel_pow2
 	vmov		r0, r1, ret
+
+	/* if (ret >= 4.0) {exp++;} */
+	movw		r4, #0xffff
+	movt		r4, #0x400f
+	cmp		r1, r4
+	addgt		r5, r5, #1
 
 	/* set exp of ret to iylog2x */
 	add		r5, r5, #0x3fc
