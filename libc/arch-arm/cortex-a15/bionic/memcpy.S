@@ -625,6 +625,7 @@ END(memcpy)
 #include "memcpy_base.S"
 
 ENTRY_PRIVATE(__memcpy_chk_fail)
+	.cfi_startproc
         // Preserve lr for backtrace.
         push    {lr}
         .save   {lr}
@@ -641,6 +642,7 @@ error_code:
 error_message:
         .word   error_string-(1b+8)
 END(__memcpy_chk_fail)
+	.cfi_endproc
 
         .data
 error_string:
