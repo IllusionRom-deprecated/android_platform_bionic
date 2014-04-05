@@ -27,9 +27,7 @@
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 
-/*
    This memcpy routine is optimised for Cortex-A15 cores and takes advantage
    of VFP or NEON when built with the appropriate flags.
 
@@ -38,12 +36,11 @@
     ARMv6 (ARMv7-a if using Neon)
     ARM state
     Unaligned accesses
+    LDRD/STRD support unaligned word accesses
 
-   Ported to work inside Bionic by Bernhard Rosenkränzer <bero@linaro.org>
  */
 
 #include <machine/asm.h>
-#include "private/libc_events.h"
 
 	.syntax unified
 	/* This implementation requires ARM state.  */
@@ -58,7 +55,6 @@
 # define USE_NEON
 
 #elif !defined (__SOFTFP__)
-#error VFP
 
 	.arch	armv6
 	.fpu	vfpv2
@@ -66,7 +62,6 @@
 # define USE_VFP
 
 #else
-#error NO FPU
 	.arch	armv6
 # define FRAME_SIZE    32
 
@@ -148,22 +143,17 @@
 	.endm
 #endif
 
-ENTRY(__memcpy_chk)
-        cmp         r2, r3
-        bhi         __memcpy_chk_fail
-
-        // Fall through to memcpy...
-END(__memcpy_chk)
-
+	.text
 ENTRY(memcpy)
 	.p2align 6
+
 	mov	dst, dstin	/* Preserve dstin, we need to return it.  */
 	cmp	count, #64
-	bge	cpy_not_short
+	bge	.Lcpy_not_short
 	/* Deal with small copies quickly by dropping straight into the
 	   exit block.  */
 
-tail63unaligned:
+.Ltail63unaligned:
 #ifdef USE_NEON
 	and	tmp1, count, #0x38
 	rsb	tmp1, tmp1, #(56 - PC_OFFSET + INSN_SIZE)
@@ -242,13 +232,13 @@ tail63unaligned:
 	strbne	src, [dst]
 	bx	lr
 
-cpy_not_short:
+.Lcpy_not_short:
 	/* At least 64 bytes to copy, but don't know the alignment yet.  */
 	str	tmp2, [sp, #-FRAME_SIZE]!
-	and	tmp2, src, #7
-	and	tmp1, dst, #7
+	and	tmp2, src, #3
+	and	tmp1, dst, #3
 	cmp	tmp1, tmp2
-	bne	cpy_notaligned
+	bne	.Lcpy_notaligned
 
 #ifdef USE_VFP
 	/* Magic dust alert!  Force VFP on Cortex-A9.  Experiments show
@@ -257,9 +247,9 @@ cpy_not_short:
 	vmov.f32	s0, s0
 #endif
 
-	/* SRC and DST have the same mutual 64-bit alignment, but we may
+	/* SRC and DST have the same mutual 32-bit alignment, but we may
 	   still need to pre-copy some bytes to get to natural alignment.
-	   We bring SRC and DST into full 64-bit alignment.  */
+	   We bring DST into full 64-bit alignment.  */
 	lsls	tmp2, dst, #29
 	beq	1f
 	rsbs	tmp2, tmp2, #0
@@ -274,12 +264,12 @@ cpy_not_short:
 
 1:
 	subs	tmp2, count, #64	/* Use tmp2 for count.  */
-	blt	tail63aligned
+	blt	.Ltail63aligned
 
 	cmp	tmp2, #512
-	bge	cpy_body_long
+	bge	.Lcpy_body_long
 
-cpy_body_medium:			/* Count in tmp2.  */
+.Lcpy_body_medium:			/* Count in tmp2.  */
 #ifdef USE_VFP
 1:
 	vldr	d0, [src, #0]
@@ -303,9 +293,9 @@ cpy_body_medium:			/* Count in tmp2.  */
 	add	dst, dst, #64
 	bge	1b
 	tst	tmp2, #0x3f
-	beq	done
+	beq	.Ldone
 
-tail63aligned:			/* Count in tmp2.  */
+.Ltail63aligned:			/* Count in tmp2.  */
 	and	tmp1, tmp2, #0x38
 	add	dst, dst, tmp1
 	add	src, src, tmp1
@@ -356,9 +346,9 @@ tail63aligned:			/* Count in tmp2.  */
 	add	src, src, #8
 	add	dst, dst, #8
 
-tail63aligned:			/* Count in tmp2.  */
+.Ltail63aligned:			/* Count in tmp2.  */
 	/* Copy up to 7 d-words of data.  Similar to Ltail63unaligned, but
-	   we know that the src and dest are 64-bit aligned so we can use
+	   we know that the src and dest are 32-bit aligned so we can use
 	   LDRD/STRD to improve efficiency.  */
 	/* TMP2 is now negative, but we don't care about that.  The bottom
 	   six bits still tell us how many bytes are left to copy.  */
@@ -393,11 +383,11 @@ tail63aligned:			/* Count in tmp2.  */
 	strhcs	tmp1, [dst], #2
 	strbne	tmp2, [dst]
 
-done:
+.Ldone:
 	ldr	tmp2, [sp], #FRAME_SIZE
 	bx	lr
 
-cpy_body_long:			/* Count in tmp2.  */
+.Lcpy_body_long:			/* Count in tmp2.  */
 
 	/* Long copy.  We know that there's at least (prefetch_lines * 64)
 	   bytes to go.  */
@@ -454,7 +444,7 @@ cpy_body_long:			/* Count in tmp2.  */
 	vstr	d2, [dst, #64 + 56]
 	add	dst, dst, #128
 	add	tmp2, tmp2, #prefetch_lines * 64
-	b	cpy_body_medium
+	b	.Lcpy_body_medium
 #else
 	/* Long copy.  Use an SMS style loop to maximize the I/O
 	   bandwidth of the core.  We don't have enough spare registers
@@ -508,12 +498,12 @@ cpy_body_long:			/* Count in tmp2.  */
 	ldrd	D_l, D_h, [sp, #24]
 	add	dst, dst, #72
 	tst	tmp2, #0x3f
-	bne	tail63aligned
+	bne	.Ltail63aligned
 	ldr	tmp2, [sp], #FRAME_SIZE
 	bx	lr
 #endif
 
-cpy_notaligned:
+.Lcpy_notaligned:
 	pld	[src]
 	pld	[src, #64]
 	/* There's at least 64 bytes to copy, but there is no mutual
@@ -535,7 +525,7 @@ cpy_notaligned:
 	pld	[src, #(3 * 64)]
 	subs	count, count, #64
 	ldrmi	tmp2, [sp], #FRAME_SIZE
-	bmi	tail63unaligned
+	bmi	.Ltail63unaligned
 	pld	[src, #(4 * 64)]
 
 #ifdef USE_NEON
@@ -616,34 +606,6 @@ cpy_notaligned:
 	ands	count, tmp2, #0x3f
 #endif
 	ldr	tmp2, [sp], #FRAME_SIZE
-	bne	tail63unaligned
+	bne	.Ltail63unaligned
 	bx	lr
 END(memcpy)
-
-#define MEMCPY_BASE         __memcpy_base
-#define MEMCPY_BASE_ALIGNED __memcpy_base_aligned
-#include "memcpy_base.S"
-
-ENTRY_PRIVATE(__memcpy_chk_fail)
-	.cfi_startproc
-        // Preserve lr for backtrace.
-        push    {lr}
-        .save   {lr}
-        .cfi_def_cfa_offset 4
-        .cfi_rel_offset lr, 0
-
-        ldr     r0, error_message
-        ldr     r1, error_code
-1:
-        add     r0, pc
-        bl      __fortify_chk_fail
-error_code:
-        .word   BIONIC_EVENT_MEMCPY_BUFFER_OVERFLOW
-error_message:
-        .word   error_string-(1b+8)
-END(__memcpy_chk_fail)
-	.cfi_endproc
-
-        .data
-error_string:
-        .string "memcpy: prevented write past end of buffer"
