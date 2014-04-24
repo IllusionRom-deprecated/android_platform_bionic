@@ -518,7 +518,7 @@ endif
 
 ifeq ($(TARGET_ARCH),arm)
   libc_common_cflags += -DSOFTFLOAT
-  libc_common_cflags += -fstrict-aliasing
+  #libc_common_cflags += -fstrict-aliasing 
   libc_crt_target_cflags := -mthumb-interwork
 endif # !arm
 
