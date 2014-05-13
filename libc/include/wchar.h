@@ -48,7 +48,7 @@ __BEGIN_DECLS
 typedef __WINT_TYPE__           wint_t;
 typedef struct { int  dummy; }  mbstate_t;
 
-typedef enum {
+enum {
     WC_TYPE_INVALID = 0,
     WC_TYPE_ALNUM,
     WC_TYPE_ALPHA,
@@ -63,7 +63,9 @@ typedef enum {
     WC_TYPE_UPPER,
     WC_TYPE_XDIGIT,
     WC_TYPE_MAX
-} wctype_t;
+};
+
+typedef int wctype_t;
 
 #ifndef WCHAR_MAX
 #define  WCHAR_MAX   INT_MAX
