@@ -65,7 +65,7 @@ enum {
     WC_TYPE_MAX
 };
 
-typedef int wctype_t;
+typedef long wctype_t;
 
 #ifndef WCHAR_MAX
 #define  WCHAR_MAX   INT_MAX
