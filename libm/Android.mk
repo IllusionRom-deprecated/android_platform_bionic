@@ -291,11 +291,12 @@ libm_mips_cflags := -fno-builtin-rintf -fno-builtin-rint
 libm_mips_includes := $(LOCAL_PATH)/mips
 libm_mips_src_files := mips/fenv.c $(libm_arch_src_files_default)
 
-libm_generic_src_files := \
-    upstream-freebsd/lib/msun/src/e_sqrt.c \
-    upstream-freebsd/lib/msun/src/e_sqrtf.c \
-    upstream-freebsd/lib/msun/src/s_cos.c \
-    upstream-freebsd/lib/msun/src/s_sin.c
+# Workaround the GCC "(long)fn -> lfn" optimization bug which will result in
+# self recursions for lrint, lrintf, and lrintl.
+# BUG: 14225968
+libm_common_cflags += -fno-builtin-rint -fno-builtin-rintf -fno-builtin-rintl
+
+libm_common_includes := $(LOCAL_PATH)/upstream-freebsd/lib/msun/src/
 
 libm_arm_neon_src_files := \
     arm/e_pow.S \
@@ -334,13 +335,10 @@ LOCAL_SRC_FILES_x86 := i387/fenv.c
 LOCAL_C_INCLUDES_x86_64 := $(LOCAL_PATH)/amd64
 LOCAL_SRC_FILES_x86_64 := amd64/fenv.c
 
-LOCAL_CFLAGS_mips := -fno-builtin-rintf -fno-builtin-rint
-LOCAL_C_INCLUDES_mips := $(LOCAL_PATH)/mips
 LOCAL_SRC_FILES_mips := mips/fenv.c
 
-LOCAL_CFLAGS_mips64 := -fno-builtin-rintf -fno-builtin-rint
-LOCAL_C_INCLUDES_mips64 := $(LOCAL_PATH)/mips
-LOCAL_SRC_FILES_mips64 := mips/fenv.c
+LOCAL_C_INCLUDES_mips64 := $(libm_ld_includes)
+LOCAL_SRC_FILES_mips64 := mips/fenv.c $(libm_ld_src_files)
 
 include $(BUILD_STATIC_LIBRARY)
 
