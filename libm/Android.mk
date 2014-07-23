@@ -116,7 +116,6 @@ libm_common_src_files += \
     upstream-freebsd/lib/msun/src/s_fdim.c \
     upstream-freebsd/lib/msun/src/s_finite.c \
     upstream-freebsd/lib/msun/src/s_finitef.c \
-    upstream-freebsd/lib/msun/src/s_floor.c \
     upstream-freebsd/lib/msun/src/s_floorf.c \
     upstream-freebsd/lib/msun/src/s_fma.c \
     upstream-freebsd/lib/msun/src/s_fmaf.c \
@@ -177,6 +176,9 @@ libm_common_src_files += \
     upstream-freebsd/lib/msun/src/w_drem.c \
     upstream-freebsd/lib/msun/src/w_dremf.c \
 
+libm_arch_src_files_default := \
+    upstream-freebsd/lib/msun/src/s_floor.c
+
 libm_common_src_files += fake_long_double.c
 
 # TODO: on Android, "long double" is "double".
@@ -217,55 +219,27 @@ libm_common_src_files += fake_long_double.c
 
 # TODO: re-enable i387/e_sqrtf.S for x86, and maybe others.
 
+libm_common_asflags :=
 libm_common_cflags := -DFLT_EVAL_METHOD=0
-libm_common_includes := $(LOCAL_PATH)/upstream-freebsd/lib/msun/src/
+libm_common_includes := \
+    $(LOCAL_PATH)/upstream-freebsd/lib/msun/src/ \
+    $(LOCAL_PATH)/../libc/private/
 
 libm_arm_includes := $(LOCAL_PATH)/arm
-libm_arm_src_files := arm/fenv.c
+include $(LOCAL_PATH)/arm/arm.mk
+libm_arm_src_files := arm/fenv.c $(libm_arch_src_files_arm)
 ifeq ($(TARGET_ARCH), arm)
-LOCAL_CFLAGS += $(libm_arm_cflags)
+LOCAL_CFLAGS += $(libm_arm_cflags) -DARM_MATH_OPTIMIZATIONS
 LOCAL_ASFLAGS += $(libm_arm_asflags)
 LOCAL_SRC_FILES += $(libm_arm_src_files)
 endif
 
 libm_x86_includes := $(LOCAL_PATH)/i386 $(LOCAL_PATH)/i387
-libm_x86_src_files := i387/fenv.c
+libm_x86_src_files := i387/fenv.c $(libm_arch_src_files_default)
 
 libm_mips_cflags := -fno-builtin-rintf -fno-builtin-rint
 libm_mips_includes := $(LOCAL_PATH)/mips
-libm_mips_src_files := mips/fenv.c
-
-ifeq ($(TARGET_CPU_VARIANT),cortex-a9)
-libm_arm_src_files += \
-    arm/k_log2.S \
-    arm/k_pow2.S \
-    arm/k_exp.S \
-    arm/e_fast_pow.S \
-    arm/e_fast_exp.S
-libm_arm_cflags += -DTARGET_CPU_VARIANT_CORTEX_A9
-libm_arm_asflags += -DTARGET_CPU_VARIANT_CORTEX_A9
-endif
-ifeq ($(TARGET_CPU_VARIANT),cortex-a15)
-libm_arm_src_files += \
-    arm/k_log2.S \
-    arm/k_pow2.S \
-    arm/k_exp.S \
-    arm/e_fast_pow.S \
-    arm/e_fast_exp.S
-libm_arm_cflags += -DTARGET_CPU_VARIANT_CORTEX_A15
-libm_arm_asflags += -DTARGET_CPU_VARIANT_CORTEX_A15
-endif
-
-ifeq ($(TARGET_CPU_VARIANT),krait)
-libm_arm_src_files += \
-    arm/k_log2.S \
-    arm/k_pow2.S \
-    arm/k_exp.S \
-    arm/e_fast_pow.S \
-    arm/e_fast_exp.S
-libm_arm_cflags += -DTARGET_CPU_VARIANT_CORTEX_KRAIT
-libm_arm_asflags += -DTARGET_CPU_VARIANT_CORTEX_KRAIT
-endif
+libm_mips_src_files := mips/fenv.c $(libm_arch_src_files_default)
 
 #
 # libm.a for target.

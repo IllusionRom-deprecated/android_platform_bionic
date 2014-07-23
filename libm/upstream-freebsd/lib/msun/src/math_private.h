@@ -679,7 +679,7 @@ irintl(long double x)
 #define	__ieee754_atan2	atan2
 #define	__ieee754_cosh	cosh
 #define	__ieee754_fmod	fmod
-#if !defined(TARGET_CPU_VARIANT_CORTEX_A9) && !defined(TARGET_CPU_VARIANT_CORTEX_A15) && !defined(TARGET_CPU_VARIANT_KRAIT)
+#if !defined(ARM_MATH_OPTIMIZATIONS)
 #define	__ieee754_pow	pow
 #define	__ieee754_exp	exp
 #endif
