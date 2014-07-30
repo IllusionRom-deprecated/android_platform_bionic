@@ -235,7 +235,8 @@ LOCAL_SRC_FILES += $(libm_arm_src_files)
 endif
 
 ifeq ($(TARGET_CPU_VARIANT),$(filter $(TARGET_CPU_VARIANT),cortex-a15 krait))
-    libm_arm_asflags += -DFPU_VFPV4
+    libm_arm_asflags += -DFPU_VFPV4 -DPRECISE_TRIGONOMETRIC
+endif
 
 libm_x86_includes := $(LOCAL_PATH)/i386 $(LOCAL_PATH)/i387
 libm_x86_src_files := i387/fenv.c $(libm_arch_src_files_default)
