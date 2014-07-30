@@ -44,6 +44,8 @@
 #define k2                  d26
 #define k3                  d25
 #define k4                  d24
+#define k5                  d23
+#define k6                  d22
 @ Values which cross the boundaries between polynomial implementations:
 #define ss                  d16
 #define ss2                 d17
@@ -61,6 +63,7 @@
 #define x                   d0
 #define bp                  d4
 #define y                   d1
+#define ln2                 d5
 @ log series:
 #define u                   d19
 #define v                   d20
@@ -81,17 +84,13 @@
 #define ylg2x_temp          d17
 #define yn_temp             d18
 #define yn_round_offset     d19
-#define ln2                 d5
 @ Careful, overwriting HIGH_WORD_MASK, reset it if you need it again ...
 #define rounded_exponent    d31
 @ exp series:
-#define k5                  d23
-#define k6                  d22
 #define k7                  d21
 #define k8                  d20
 #define ss3                 d19
-@ overwrite double_1 (we're done with it by now)
-#define k0                  d28
+#define k0                  d20
 #define twoto1o4            d6
 
 @instructions that gas doesn't like to encode correctly:
@@ -100,10 +99,7 @@
 #define vmovne_f64          fconstdne
 
 ENTRY(pow_neon)
-#if defined(KRAIT_NO_AAPCS_VFP_MODE)
-     @ ARM ABI has inputs coming in via r registers, lets move to a d register
     vmov            x, x_lw, x_hw
-#endif
     push            {r4, r5, r6, r7, r8, r9, r10, lr}
 
     @ pre-staged bp values
@@ -134,10 +130,7 @@ ENTRY(pow_neon)
     @ double_1 = (double) 1.0
     vmov_f64        double_1, #0x70
 
-#if defined(KRAIT_NO_AAPCS_VFP_MODE)
-     @ move y from r registers to a d register
     vmov            y, y_lw, y_hw
-#endif
 
     cmp             xmantissa, twoto1o5
 
@@ -146,16 +139,16 @@ ENTRY(pow_neon)
 
     adr             literals, .LliteralTable
 
-    bhi             .Lxgt2to1over5
-    @ zero out lg2 constant term if don't offset our input
-    vsub.f64        lg2const, lg2const, lg2const
-    b               .Lxle2to1over5
+    movw            iEXP_MASK, #0xfff0
+    movt            iEXP_MASK, #0x0000
 
-.Lxgt2to1over5:
+    bic             ix, x_hw, iEXP_MASK
+
     @ if normalized x > 2^(1/5), bp = 1 + (2^(2/5)-1) = 2^(2/5)
-    vadd.f64        bp, bp, bpa
+    vaddhi.f64      bp, bp, bpa
+    @ zero out lg2 constant term if don't offset our input
+    vsubls.f64      lg2const, lg2const, lg2const
 
-.Lxle2to1over5:
     @ will need ln2 for various things
     vldr            ln2, .Lln2
 
@@ -168,12 +161,9 @@ ENTRY(pow_neon)
     @ N = (floor(log2(x)) + 0x3ff) * 2^52
     vand.i64        int_n, x, EXPONENT_MASK
 
-    bls             .Lxle2to3over5
     @ if normalized x > 2^(3/5), bp = 2^(2/5) + (2^(4/5) - 2^(2/5) = 2^(4/5)
-    vadd.f64      bp, bp, bpb
-    vadd.f64      lg2const, lg2const, lg2const
-
-.Lxle2to3over5:
+    vaddhi.f64      bp, bp, bpb
+    vaddhi.f64      lg2const, lg2const, lg2const
 
     @ load log2 polynomial series constants
     vldm            literals!, {k4, k3, k2, k1}
@@ -246,18 +236,14 @@ ENTRY(pow_neon)
     @ Load 2^(1/4) for later computations
     vldr            twoto1o4, .Ltwoto1o4
 
+    @ move unmodified y*lg2x into temp space
+    vmov            ylg2x_temp, ylg2x
+    @ move unmodified y*n into temp space
+    vmov            yn_temp, double_n
+
     @ either add or subtract one based on the sign of double_n and ylg2x
     vshr.s64        ylg2x_round_offset, ylg2x, #62
     vshr.s64        yn_round_offset, double_n, #62
-
-    @ move unmodified y*lg2x into temp space
-    vmov            ylg2x_temp, ylg2x
-    @ compute floor(8 y * n + 1)/8
-    @ and floor(8 y (log2(x)) + 1)/8
-    vcvt.s32.f64    ylg2x, ylg2x, #3
-    @ move unmodified y*n into temp space
-    vmov            yn_temp, double_n
-    vcvt.s32.f64    double_n, double_n, #3
 
     @ load exp polynomial series constants
     vldm            literals!, {k8, k7, k6, k5, k4, k3, k2, k1}
@@ -269,6 +255,11 @@ ENTRY(pow_neon)
     vorr.u64        ylg2x_round_offset, ylg2x_round_offset, int_1
     vorr.u64        yn_round_offset, yn_round_offset, int_1
 
+    @ compute floor(8 y * n + 1)/8
+    @ and floor(8 y (log2(x)) + 1)/8
+    vcvt.s32.f64    ylg2x, ylg2x, #3
+
+    vcvt.s32.f64    double_n, double_n, #3
     @ round up to the nearest 1/8th
     vadd.s32        ylg2x, ylg2x, ylg2x_round_offset
     vadd.s32        double_n, double_n, yn_round_offset
@@ -384,10 +375,8 @@ ENTRY(pow_neon)
     vmul.f64        Result, expadjustment, Result
 
 .LleavePow:
-#if defined(KRAIT_NO_AAPCS_VFP_MODE)
     @ return Result (FP)
     vmov            Return_lw, Return_hw, Result
-#endif
 .LleavePowDirect:
     @ leave directly returning whatever is in Return_lw and Return_hw
     pop             {r4, r5, r6, r7, r8, r9, r10, pc}
