@@ -67,7 +67,7 @@
 #define MLSF64		vmls.f64
 #endif
 
-ENTRY(__kernel_pow2)	/* x in d0 and r0/r1, 1.0 <= x < 2.0 */
+ENTRY(__kernel_pow2)
 	.cfi_startproc
 lookup:
 	/* get index in lut */

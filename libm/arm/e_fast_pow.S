@@ -42,7 +42,7 @@
 #define MLSF64		vmls.f64
 #endif
 
-ENTRY(pow)	/* x in r0, r1. y in r2, r3 */
+ENTRY(pow)
 	.cfi_startproc
 	push		{r4, r5, lr}
 

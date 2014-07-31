@@ -41,7 +41,7 @@
 #define MLSF64	vmls.f64
 #endif
 
-ENTRY_PRIVATE(__kernel_cos_fast)	/* x in d2, y in d3 */
+ENTRY_PRIVATE(__kernel_cos_fast)
 	.cfi_startproc
 	/* z = x^2; */
 	vmul.f64	z, x, x

@@ -28,7 +28,7 @@
 
 	.fpu	neon
 
-ENTRY(cos)	/* x in r0, r1 */
+ENTRY(cos)
 	.cfi_startproc
 	vmov		x, ixl, ixh
 
