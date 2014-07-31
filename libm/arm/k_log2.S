@@ -81,7 +81,7 @@
 #define MLSF64		vmls.f64
 #endif
 
-ENTRY_PRIVATE(__kernel_log2)	/* x in d0 and r0/r1, 1.0 <= x < 2.0 */
+ENTRY_PRIVATE(__kernel_log2)
 
 lookup:
 	/* get index in lut */

@@ -47,7 +47,7 @@
 #define MLSF64	vmls.f64
 #endif
 
-ENTRY(__rem_pio2_fast)		/* x in d0 & r0, r1. Return y0, y1 in d2, d3. Return n in r0. */
+ENTRY(__rem_pio2_fast)
 
 	bic		abs_ixh, ixh, #0x80000000
 

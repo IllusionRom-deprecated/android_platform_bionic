@@ -31,7 +31,7 @@
 
 #include <bionic_asm.h>
 
-ENTRY(floor)    /* x in r0, r1 */
+ENTRY(floor)
 
         and             r3, r1, #0x80000000     /* sign(x) */
         bic             r1, r1, #0x80000000     /* x = abs(x) */

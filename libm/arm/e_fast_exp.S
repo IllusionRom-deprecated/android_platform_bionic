@@ -30,7 +30,7 @@
 #define rk		r5
 #define t0		d3
 
-ENTRY(exp)	/* x in r0, r1 */
+ENTRY(exp)
 
 	/* |x| < 2^(-28)? */
 	bic		r2, r1, #0x80000000
