@@ -20,7 +20,8 @@
  *
  */
 
-#include <bionic_asm.h>
+#include <machine/cpu-features.h>
+#include <machine/asm.h>
 
 #define x		d0
 #define y		d1

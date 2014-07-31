@@ -29,7 +29,8 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <bionic_asm.h>
+#include <machine/cpu-features.h>
+#include <machine/asm.h>
 
 ENTRY(sqrt)
     .cfi_startproc

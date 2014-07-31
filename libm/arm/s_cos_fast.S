@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-#include <bionic_asm.h>
+#include <machine/cpu-features.h>
+#include <machine/asm.h>
 
 #define ixl	r0
 #define	ixh	r1

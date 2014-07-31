@@ -51,7 +51,8 @@
  *
  */
 
-#include <bionic_asm.h>
+#include <machine/cpu-features.h>
+#include <machine/asm.h>
 
 #define LUT_SIZE	256
 #define LUT_SIZE_SHIFT	8
