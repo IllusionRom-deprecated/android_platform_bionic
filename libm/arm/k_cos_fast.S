@@ -42,7 +42,7 @@
 #endif
 
 ENTRY_PRIVATE(__kernel_cos_fast)	/* x in d2, y in d3 */
-
+	.cfi_startproc
 	/* z = x^2; */
 	vmul.f64	z, x, x
 
@@ -115,5 +115,5 @@ calc_r:
 	.word		0x5555554C, 0x3FA55555	/* 4.16666666666666019037e-02 */
 .LC4:
 	.word		0x809C52AD, 0xBE927E4F	/* -2.75573143513906633035e-07 */
-
+	.cfi_endproc
 END(__kernel_cos_fast)

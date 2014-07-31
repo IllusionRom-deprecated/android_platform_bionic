@@ -48,7 +48,7 @@
 #endif
 
 ENTRY(__rem_pio2_fast)
-
+	.cfi_startproc
 	bic		abs_ixh, ixh, #0x80000000
 
 	/* |x| ~< 2^20*(pi/2)? */
@@ -183,5 +183,5 @@ __ret_nan:
 .Lpio2_3:
 	.word		0x2E000000, 0x3BA3198A	/* 2.02226624871116645580e-21 */
 	.word		0x252049C1, 0x397B839A	/* 8.47842766036889956997e-32 */
-
+	.cfi_endproc
 END(__rem_pio2_fast)

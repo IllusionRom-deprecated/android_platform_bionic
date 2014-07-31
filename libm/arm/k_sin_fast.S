@@ -44,7 +44,7 @@
 #endif
 
 ENTRY_PRIVATE(__kernel_sin_fast)
-
+	.cfi_startproc
 	/* z = x^2; */
 	vmul.f64	z, x, x
 
@@ -128,5 +128,5 @@ __tail_is_not_zero:
 	.word		0x55555549, 0xBFC55555	/* -1.66666666666666324348e-01 */
 .LS2:
 	.word		0x1110F8A6, 0x3F811111	/* 8.33333333332248946124e-03 */
-
+	.cfi_endproc
 END(__kernel_sin_fast)

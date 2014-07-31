@@ -53,7 +53,7 @@
 #endif
 
 ENTRY(__kernel_exp)
-
+	.cfi_startproc
 lookup:
 	/* get index in lut */
 	add		ixh, ixh, #(1 << (20-LUT_SIZE_SHIFT-1))
@@ -229,5 +229,5 @@ taylor_series:
 	.word	0x5f0d6723, 0x401d1916	/* e^1.984375 */
 	.word	0xe4d7cbb4, 0x401d5382	/* e^1.992188 */
 	.word	0xb8d4ddae, 0x401d8e64	/* e^2.000000 */
-
+	.cfi_endproc
 END(__kernel_exp)

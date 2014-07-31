@@ -29,7 +29,7 @@
 	.fpu	neon
 
 ENTRY(sin)	/* x in r0, r1 */
-
+	.cfi_startproc
 	vmov		x, ixl, ixh
 
 	/* |x| > pi/4? */
@@ -89,7 +89,7 @@ __3:
 	eor		r1, r1, #0x80000000
 	pop		{pc}
 	nop
-
+	.cfi_endproc
 END(sin)
 
 	.weak		sinl

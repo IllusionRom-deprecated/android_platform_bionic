@@ -82,7 +82,7 @@
 #endif
 
 ENTRY_PRIVATE(__kernel_log2)
-
+	.cfi_startproc
 lookup:
 	/* get index in lut */
 	add		ixh, ixh, #(1 << (20-LUT_SIZE_SHIFT-1))
@@ -652,5 +652,5 @@ taylor_series_expanding:
 	.word	0xf15bd1a0, 0x3fefe8e4, 0x02010080, 0x3fe00804
 	/* log2(2.000000), 1.0 / 2.000000 */
 	.word	0x00000000, 0x3ff00000, 0x00000000, 0x3fe00000
-
+	.cfi_endproc
 END(__kernel_log2)

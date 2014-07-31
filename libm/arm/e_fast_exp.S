@@ -31,6 +31,7 @@
 #define t0		d3
 
 ENTRY(exp)
+	 .cfi_startproc
 
 	/* |x| < 2^(-28)? */
 	bic		r2, r1, #0x80000000
@@ -131,7 +132,7 @@ skip:
 	.word	0x54d37c9a, 0x4103de16	/* e^12.000000 */
 	.word	0x916ac955, 0x411b00b5	/* e^13.000000 */
 	.word	0x48bf05d7, 0x413259ac	/* e^14.000000 */
-
+	.cfi_endproc
 END(exp)
 
 	.weak		expl

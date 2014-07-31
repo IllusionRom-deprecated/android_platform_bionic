@@ -32,8 +32,10 @@
 #include <bionic_asm.h>
 
 ENTRY(sqrtf)
+    .cfi_startproc
     vmov.f32    s0, r0
     vsqrt.f32   s0, s0
     vmov.f32    r0, s0
     bx          lr
+    .cfi_endproc
 END(sqrtf)

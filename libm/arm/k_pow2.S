@@ -68,7 +68,7 @@
 #endif
 
 ENTRY(__kernel_pow2)	/* x in d0 and r0/r1, 1.0 <= x < 2.0 */
-
+	.cfi_startproc
 lookup:
 	/* get index in lut */
 	add		ixh, ixh, #(1 << (20-LUT_SIZE_SHIFT-1))
@@ -374,5 +374,5 @@ taylor_series:
 	.word	0x2b8f71f1, 0x400fd3c2	/* 2^1.992188 */
 	.word	0x6b2a23d9, 0x400fe9d9	/* 2^1.996094 */
 	.word	0x00000000, 0x40100000	/* 2^2.000000 */
-
+	.cfi_endproc
 END(__kernel_pow2)

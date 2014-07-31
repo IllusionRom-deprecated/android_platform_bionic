@@ -29,7 +29,7 @@
 	.fpu	neon
 
 ENTRY(cos)	/* x in r0, r1 */
-
+	.cfi_startproc
 	vmov		x, ixl, ixh
 
 	/* |x| > pi/4? */
@@ -89,7 +89,7 @@ __3:
 	pop		{pc}
 	nop
 	nop
-
+	.cfi_endproc
 END(cos)
 
 	.weak		cosl

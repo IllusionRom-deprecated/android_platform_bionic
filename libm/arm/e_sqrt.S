@@ -32,10 +32,12 @@
 #include <bionic_asm.h>
 
 ENTRY(sqrt)
+    .cfi_startproc
     vmov.f64    d0, r0, r1
     vsqrt.f64   d0, d0
     vmov.f64    r0, r1, d0
     bx          lr
+    .cfi_endproc
 END(sqrt)
 
 #if LDBL_MANT_DIG == 53

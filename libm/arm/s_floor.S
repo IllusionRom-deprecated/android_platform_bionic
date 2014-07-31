@@ -32,7 +32,7 @@
 #include <bionic_asm.h>
 
 ENTRY(floor)
-
+	.cfi_startproc
         and             r3, r1, #0x80000000     /* sign(x) */
         bic             r1, r1, #0x80000000     /* x = abs(x) */
 
@@ -132,7 +132,7 @@ return_x_neg:
         vsub.f64        d16, d16, d18
         vmov            r0, r1, d16
         bx              lr
-
+	.cfi_endproc
 END(floor)
 
 #if LDBL_MANT_DIG == 53

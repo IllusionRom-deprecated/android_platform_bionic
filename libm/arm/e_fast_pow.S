@@ -43,7 +43,7 @@
 #endif
 
 ENTRY(pow)	/* x in r0, r1. y in r2, r3 */
-
+	.cfi_startproc
 	push		{r4, r5, lr}
 
 	/* x is close to 0 / minus? */
@@ -186,7 +186,7 @@ return_recp:
 punt_to_ieee754_pow:
 	bl		__ieee754_pow
 	pop		{r4, r5, pc}
-
+	.cfi_endproc
 END(pow)
 
 	.weak		powl
