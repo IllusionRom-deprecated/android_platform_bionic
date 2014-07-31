@@ -91,7 +91,6 @@ libm_common_src_files += \
     upstream-freebsd/lib/msun/src/s_conjf.c \
     upstream-freebsd/lib/msun/src/s_copysign.c \
     upstream-freebsd/lib/msun/src/s_copysignf.c \
-    upstream-freebsd/lib/msun/src/s_cos.c \
     upstream-freebsd/lib/msun/src/s_cosf.c \
     upstream-freebsd/lib/msun/src/s_cproj.c \
     upstream-freebsd/lib/msun/src/s_cprojf.c \
@@ -160,7 +159,6 @@ libm_common_src_files += \
     upstream-freebsd/lib/msun/src/s_signgam.c \
     upstream-freebsd/lib/msun/src/s_significand.c \
     upstream-freebsd/lib/msun/src/s_significandf.c \
-    upstream-freebsd/lib/msun/src/s_sin.c \
     upstream-freebsd/lib/msun/src/s_sinf.c \
     upstream-freebsd/lib/msun/src/s_tan.c \
     upstream-freebsd/lib/msun/src/s_tanf.c \
@@ -177,7 +175,9 @@ libm_common_src_files += \
 libm_arch_src_files_default := \
     upstream-freebsd/lib/msun/src/s_floor.c \
     upstream-freebsd/lib/msun/src/e_sqrt.c \
-    upstream-freebsd/lib/msun/src/e_sqrtf.c
+    upstream-freebsd/lib/msun/src/e_sqrtf.c \
+    upstream-freebsd/lib/msun/src/s_cos.c \
+    upstream-freebsd/lib/msun/src/s_sin.c
 
 libm_common_src_files += fake_long_double.c
 
@@ -230,7 +230,7 @@ include $(LOCAL_PATH)/arm/arm.mk
 libm_arm_src_files := arm/fenv.c $(libm_arch_src_files_arm)
 ifeq ($(TARGET_ARCH), arm)
 LOCAL_CFLAGS += $(libm_arm_cflags) -DARM_MATH_OPTIMIZATIONS
-LOCAL_ASFLAGS += $(libm_arm_asflags)
+LOCAL_ASFLAGS += $(libm_arm_asflags) -DARM_MATH_OPTIMIZATIONS
 LOCAL_SRC_FILES += $(libm_arm_src_files)
 endif
 
