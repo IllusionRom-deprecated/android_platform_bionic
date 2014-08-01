@@ -243,7 +243,6 @@ ifeq ($(TARGET_CPU_VARIANT),cortex-a9)
 libm_arm_src_files += \
     arm/k_log2.S \
     arm/k_pow2.S \
-    arm/e_fast_pow.S \
     arm/e_sqrt.S \
     arm/e_sqrtf.S \
     arm/s_floor.S
@@ -255,8 +254,6 @@ libm_arm_src_files += \
     arm/k_log2.S \
     arm/k_pow2.S \
     arm/k_exp.S \
-    arm/e_fast_pow.S \
-    arm/e_fast_exp.S \
     arm/e_sqrt.S \
     arm/e_sqrtf.S \
     arm/s_floor.S \
@@ -296,10 +293,8 @@ libm_generic_src_files := \
 libm_arm_neon_src_files := \
     arm/e_pow.S \
     arm/e_sqrt.S \
-    arm/e_sqrtf.S \
-    arm/s_cos.S \
-    arm/s_sin.S
-
+    arm/e_sqrtf.S 
+ 
 ifeq ($(ARCH_ARM_HAVE_NEON),true)
   libm_common_src_files += $(libm_arm_neon_src_files)
 else # ! ARCH_ARM_HAVE_NEON
