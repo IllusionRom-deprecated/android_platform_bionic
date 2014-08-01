@@ -43,7 +43,7 @@
 #define MLSF64		vmls.f64
 #endif
 
-ENTRY(pow)
+ENTRY(__ieee754_pow)
 	.cfi_startproc
 	push		{r4, r5, lr}
 
@@ -188,7 +188,7 @@ punt_to_ieee754_pow:
 	bl		__ieee754_pow
 	pop		{r4, r5, pc}
 	.cfi_endproc
-END(pow)
+END(__ieee754_pow)
 
 	.weak		powl
 	.equ		powl,pow

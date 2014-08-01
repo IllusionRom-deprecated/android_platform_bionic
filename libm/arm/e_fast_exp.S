@@ -31,7 +31,7 @@
 #define rk		r5
 #define t0		d3
 
-ENTRY(exp)
+ENTRY(__ieee754_exp)
 	 .cfi_startproc
 
 	/* |x| < 2^(-28)? */
@@ -134,7 +134,7 @@ skip:
 	.word	0x916ac955, 0x411b00b5	/* e^13.000000 */
 	.word	0x48bf05d7, 0x413259ac	/* e^14.000000 */
 	.cfi_endproc
-END(exp)
+END(__ieee754_exp)
 
 	.weak		expl
 	.equ		expl, exp
