@@ -85,21 +85,6 @@ static size_t get_stack_size() {
   return stack_size;
 }
 
-static size_t get_stack_size() {
-  const size_t minimal_stack_size = 128 * 1024;
-  size_t stack_size = minimal_stack_size;
-  struct rlimit stack_limit;
-  int rlimit_result = getrlimit(RLIMIT_STACK, &stack_limit);
-  if ((rlimit_result == 0) && (stack_limit.rlim_cur != RLIM_INFINITY)) {
-    stack_size = stack_limit.rlim_cur;
-    stack_size = (stack_size & ~(PAGE_SIZE - 1));
-    if (stack_size < minimal_stack_size) {
-      stack_size = minimal_stack_size;
-    }
-  }
-  return stack_size;
-}
-
 /* Init TLS for the initial thread. Called by the linker _before_ libc is mapped
  * in memory. Beware: all writes to libc globals from this function will
  * apply to linker-private copies and will not be visible from libc later on.
