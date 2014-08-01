@@ -115,7 +115,6 @@ libm_common_src_files += \
     upstream-freebsd/lib/msun/src/s_fdim.c \
     upstream-freebsd/lib/msun/src/s_finite.c \
     upstream-freebsd/lib/msun/src/s_finitef.c \
-    upstream-freebsd/lib/msun/src/s_floor.c \
     upstream-freebsd/lib/msun/src/s_floorf.c \
     upstream-freebsd/lib/msun/src/s_fma.c \
     upstream-freebsd/lib/msun/src/s_fmaf.c \
@@ -219,21 +218,74 @@ libm_common_src_files += fake_long_double.c
 
 # TODO: re-enable i387/e_sqrtf.S for x86, and maybe others.
 
-libm_common_cflags := -DFLT_EVAL_METHOD=0 -std=c99
-libm_common_includes := $(LOCAL_PATH)/upstream-freebsd/lib/msun/src/
+libm_common_asflags :=
+libm_common_cflags := -DFLT_EVAL_METHOD=0
+libm_common_includes := \
+    $(LOCAL_PATH)/upstream-freebsd/lib/msun/src/ \
+    $(LOCAL_PATH)/../libc/private/
 
 libm_arm_includes := $(LOCAL_PATH)/arm
-libm_arm_src_files := arm/fenv.c
+libm_arm_src_files := arm/fenv.c $(libm_arch_src_files_arm)
+ifeq ($(TARGET_ARCH), arm)
+LOCAL_CFLAGS += $(libm_arm_cflags)
+LOCAL_ASFLAGS += $(libm_arm_asflags)
+LOCAL_SRC_FILES += $(libm_arm_src_files)
+endif
+
+ifneq ($(TARGET_ARCH),arm)
+libm_common_src_files += \
+    upstream-freebsd/lib/msun/src/s_floor.c \
+    upstream-freebsd/lib/msun/src/e_sqrt.c \
+    upstream-freebsd/lib/msun/src/e_sqrtf.c
+endif
+
+ifeq ($(TARGET_CPU_VARIANT),cortex-a9)
+libm_arm_src_files += \
+    arm/k_log2.S \
+    arm/k_pow2.S \
+    arm/e_fast_pow.S \
+    arm/e_sqrt.S \
+    arm/e_sqrtf.S \
+    arm/s_floor.S
+libm_arm_cflags += -DLIBM_OPT_POW
+libm_arm_asflags += -DLIBM_OPT_POW
+else
+ifeq ($(TARGET_CPU_VARIANT),$(filter $(TARGET_CPU_VARIANT),cortex-a15 krait))
+libm_arm_src_files += \
+    arm/k_log2.S \
+    arm/k_pow2.S \
+    arm/k_exp.S \
+    arm/e_fast_pow.S \
+    arm/e_fast_exp.S \
+    arm/e_sqrt.S \
+    arm/e_sqrtf.S \
+    arm/s_floor.S \
+    arm/e_rem_pio2_fast.S \
+    arm/e_rem_pio2_large.c \
+    arm/k_sin_fast.S \
+    arm/k_cos_fast.S \
+    arm/s_sin_fast.S \
+    arm/s_cos_fast.S
+libm_arm_cflags += -DLIBM_OPT_SIN_COS -DPRECISE_TRIGONOMETRIC -DLIBM_OPT_POW
+libm_arm_asflags += -DFPU_VFPV4 -DLIBM_OPT_SIN_COS -DPRECISE_TRIGONOMETRIC \
+-DLIBM_OPT_POW
+else
+libm_arm_src_files += \
+    upstream-freebsd/lib/msun/src/s_floor.c \
+    upstream-freebsd/lib/msun/src/e_sqrt.c \
+    upstream-freebsd/lib/msun/src/e_sqrtf.c
+endif
+endif
 
 libm_x86_includes := $(LOCAL_PATH)/i386 $(LOCAL_PATH)/i387
-libm_x86_src_files := i387/fenv.c
+libm_x86_src_files := i387/fenv.c $(libm_arch_src_files_default)
 
 libm_x86_64_includes := $(LOCAL_PATH)/amd64
 libm_x86_64_src_files := amd64/fenv.c
 
 libm_mips_cflags := -fno-builtin-rintf -fno-builtin-rint
 libm_mips_includes := $(LOCAL_PATH)/mips
-libm_mips_src_files := mips/fenv.c
+libm_mips_src_files := mips/fenv.c $(libm_arch_src_files_default)
 
 libm_generic_src_files := \
     upstream-freebsd/lib/msun/src/e_sqrt.c \
@@ -262,6 +314,7 @@ LOCAL_MODULE:= libm
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 LOCAL_ARM_MODE := arm
 LOCAL_CFLAGS := $(libm_common_cflags) $(libm_$(TARGET_ARCH)_cflags)
+LOCAL_ASFLAGS := $(libm_common_asflags)
 LOCAL_C_INCLUDES += $(libm_common_includes) $(libm_$(TARGET_ARCH)_includes)
 LOCAL_SRC_FILES := $(libm_common_src_files) $(libm_$(TARGET_ARCH)_src_files)
 LOCAL_SYSTEM_SHARED_LIBRARIES := libc
