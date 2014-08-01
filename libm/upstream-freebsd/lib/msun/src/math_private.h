@@ -679,12 +679,10 @@ irintl(long double x)
 #define	__ieee754_atan2	atan2
 #define	__ieee754_cosh	cosh
 #define	__ieee754_fmod	fmod
-#if !defined(ARM_MATH_OPTIMIZATIONS)
 #define	__ieee754_pow	pow
 #define	__ieee754_exp	exp
 #define	__ieee754_sin	sin
 #define	__ieee754_cos	cos
-#endif
 #define	__ieee754_lgamma lgamma
 #define	__ieee754_gamma	gamma
 #define	__ieee754_lgamma_r lgamma_r
